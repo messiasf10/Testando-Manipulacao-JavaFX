@@ -15,15 +15,16 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
 /**
@@ -41,6 +42,10 @@ public class TelaPrincipalController implements Initializable {
     private Slider sliderOpacidade, sliderEscala;
     @FXML
     private ColorPicker colorPick;
+    @FXML
+    private Accordion acordionDireito;
+    @FXML
+    private TitledPane titledPaneProp;
     private ToggleGroup grupoA;
     private static double RAIO_CIRCULO = 20, LARG_RET = 45, ALT_RET = 25;
     private static Node node;
@@ -69,7 +74,8 @@ public class TelaPrincipalController implements Initializable {
         tgoRetangulo.setGraphic(imgRetangulo);
         tgoSelecionar.setGraphic(imgSeta);
         grupoA = new ToggleGroup();
-        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);
+        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);  
+        acordionDireito.setExpandedPane(titledPaneProp);
     }
 
     private void initListeners() {
@@ -86,7 +92,6 @@ public class TelaPrincipalController implements Initializable {
         tgoRetangulo.setOnAction(event -> {
             panePrincipal.setOnMouseClicked(evento -> {
                 Retangulo retangulo = new Retangulo(LARG_RET, ALT_RET);
-                //Circle circulo = circ.criarCirculo(raio, panePrincipal);
                 retangulo.setTranslateX(evento.getX());
                 retangulo.setTranslateY(evento.getY());
                 retangulo.removeListeners();
@@ -125,7 +130,7 @@ public class TelaPrincipalController implements Initializable {
             public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
                 ((Shape) node).setFill(new Color(newValue.getRed(), newValue.getGreen(), newValue.getBlue(), newValue.getOpacity()));
             }
-        });
+        });        
     }
 
     public static void setNode(Node node) {
