@@ -49,7 +49,7 @@
                       </Tab>
                     </tabs>
                   </TabPane>
-                  <Pane fx:id="panePrincipal" />
+                  <Pane fx:id="panePrincipal" prefHeight="487.0" prefWidth="467.0" />
                   <Accordion fx:id="acordionDireito">
                     <panes>
                       <TitledPane fx:id="titledPaneProp" text="Propriedades">

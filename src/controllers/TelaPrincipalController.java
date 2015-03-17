@@ -5,6 +5,7 @@
  */
 package controllers;
 
+import com.sun.javafx.geom.Point2D;
 import draganddrop.Circulo;
 import draganddrop.Retangulo;
 import java.net.URL;
@@ -25,6 +26,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
 /**
@@ -49,6 +51,10 @@ public class TelaPrincipalController implements Initializable {
     private ToggleGroup grupoA;
     private static double RAIO_CIRCULO = 20, LARG_RET = 45, ALT_RET = 25;
     private static Node node;
+    private double initX = 0;
+    private double initY = 0;
+    private Point2D ponto;
+    private Rectangle retanguloSelecao = new Rectangle();
 
     /**
      * Initializes the controller class.
@@ -74,7 +80,7 @@ public class TelaPrincipalController implements Initializable {
         tgoRetangulo.setGraphic(imgRetangulo);
         tgoSelecionar.setGraphic(imgSeta);
         grupoA = new ToggleGroup();
-        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);  
+        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);
         acordionDireito.setExpandedPane(titledPaneProp);
     }
 
@@ -99,7 +105,41 @@ public class TelaPrincipalController implements Initializable {
             });
         });
         tgoSelecionar.setOnAction(event -> {
+            retanguloSelecao.setStroke(Color.BLUE);
+            retanguloSelecao.setStrokeWidth(1);
+            retanguloSelecao.setFill(Color.SLATEBLUE);
+            retanguloSelecao.setOpacity(0.5);
+            retanguloSelecao.toFront();            
+            panePrincipal.getChildren().add(retanguloSelecao);            
             panePrincipal.setOnMouseClicked(null);
+            panePrincipal.setOnMousePressed(evento -> {
+                initX = evento.getX();
+                initY = evento.getY();
+                ponto = new Point2D((float) evento.getX(), (float) evento.getY());
+                System.out.println("mouse pressed");
+            });
+            panePrincipal.setOnMouseDragged(mouse -> {
+                if (!mouseSobreShape()) {
+                    double dragX = mouse.getSceneX() - ponto.x;
+                    double dragY = mouse.getSceneY() - ponto.y;
+                    //CALCULA A NOVA POSICAO DO CIRCULO
+                    double novaPosicaoX = initX + dragX;
+                    double novaPosicaoY = initY + dragY;
+                    retanguloSelecao.setTranslateX(initX);
+                    retanguloSelecao.setTranslateY(initY);
+                    retanguloSelecao.setWidth(mouse.getX() - initX);
+                    retanguloSelecao.setHeight(mouse.getY() - initY);
+                }
+                else {
+                    System.out.println("mouse sobre shape");
+                }
+            });
+            panePrincipal.setOnMouseReleased(mouse ->{
+                retanguloSelecao.setTranslateX(-1);
+                retanguloSelecao.setTranslateY(-1);
+                retanguloSelecao.setWidth(0);
+                retanguloSelecao.setHeight(0);
+            });
             ObservableList<Node> listaCirculos = panePrincipal.getChildren();
             for (Node node : listaCirculos) {
                 if (node instanceof Circulo) {
@@ -130,7 +170,23 @@ public class TelaPrincipalController implements Initializable {
             public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
                 ((Shape) node).setFill(new Color(newValue.getRed(), newValue.getGreen(), newValue.getBlue(), newValue.getOpacity()));
             }
-        });        
+        });
+    }
+
+    public boolean mouseSobreShape() {
+        ObservableList<Node> listaCirculos = panePrincipal.getChildren();
+        for (Node node : listaCirculos) {
+            if (node instanceof Circulo) {
+                if (((Circulo) node).isMousePorCima()) {
+                    return true;
+                }
+            } else if (node instanceof Retangulo) {
+                if (((Retangulo) node).isMousePorCima()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void setNode(Node node) {

@@ -27,6 +27,7 @@ public class Circulo extends Circle {
     private double initX;
     private double initY;
     private Point2D ponto;    
+    private boolean mousePorCima = false;
 
     public Circulo(double raio) {
         setRadius(raio);
@@ -58,7 +59,11 @@ public class Circulo extends Circle {
             ponto = new Point2D((float) mouse.getSceneX(), (float) mouse.getSceneY());
         });
         setOnMouseEntered(event -> {
-            this.toFront();
+            //this.toFront();
+            this.mousePorCima = true;
+        });
+        setOnMouseExited(mouse ->{
+            this.mousePorCima = false;
         });
         setOnMouseClicked(event -> {
             ObservableList<Node> lista = principal.getChildren();
@@ -81,6 +86,14 @@ public class Circulo extends Circle {
         setOnMouseEntered(null);
         setOnMouseExited(null);
         setOnMouseClicked(null);
+    }
+
+    public boolean isMousePorCima() {
+        return mousePorCima;
+    }
+
+    public void setMousePorCima(boolean mousePorCima) {
+        this.mousePorCima = mousePorCima;
     }
 
 }

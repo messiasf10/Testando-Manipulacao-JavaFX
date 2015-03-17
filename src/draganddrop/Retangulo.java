@@ -26,6 +26,7 @@ public class Retangulo extends Rectangle {
     private double initX;
     private double initY;
     private Point2D ponto;
+    private boolean mousePorCima = false;
     
     public Retangulo(double largura, double altura){
         setWidth(largura);
@@ -58,7 +59,11 @@ public class Retangulo extends Rectangle {
             ponto = new Point2D((float) mouse.getSceneX(), (float) mouse.getSceneY());
         });
         setOnMouseEntered(event -> {
-            this.toFront();
+            //this.toFront();
+            this.mousePorCima = true;
+        });
+        setOnMouseExited(event -> {
+            this.mousePorCima = false;
         });
         setOnMouseClicked(event -> {
             ObservableList<Node> lista = principal.getChildren();
@@ -81,6 +86,14 @@ public class Retangulo extends Rectangle {
         setOnMouseEntered(null);
         setOnMouseExited(null);
         setOnMouseClicked(null);
+    }
+    
+    public boolean isMousePorCima() {
+        return mousePorCima;
+    }
+
+    public void setMousePorCima(boolean mousePorCima) {
+        this.mousePorCima = mousePorCima;
     }
     
 }
