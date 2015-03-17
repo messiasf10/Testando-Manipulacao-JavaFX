@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,6 +56,7 @@ public class TelaPrincipalController implements Initializable {
     private double initY = 0;
     private Point2D ponto;
     private Rectangle retanguloSelecao = new Rectangle();
+    private ObservableList<Node> nodesSelecteds = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
@@ -87,21 +89,25 @@ public class TelaPrincipalController implements Initializable {
     private void initListeners() {
         tgoCirculo.setOnAction(event -> {
             panePrincipal.setOnMouseClicked(evento -> {
-                Circulo circulo = new Circulo(RAIO_CIRCULO);
-                //Circle circulo = circ.criarCirculo(raio, panePrincipal);
-                circulo.setTranslateX(evento.getX());
-                circulo.setTranslateY(evento.getY());
-                circulo.removeListeners();
-                panePrincipal.getChildren().add(circulo);
+                if (!mouseSobreShape()) {
+                    Circulo circulo = new Circulo(RAIO_CIRCULO);
+                    //Circle circulo = circ.criarCirculo(raio, panePrincipal);
+                    circulo.setTranslateX(evento.getX());
+                    circulo.setTranslateY(evento.getY());
+                    circulo.removeListeners();
+                    panePrincipal.getChildren().add(circulo);
+                }
             });
         });
         tgoRetangulo.setOnAction(event -> {
             panePrincipal.setOnMouseClicked(evento -> {
-                Retangulo retangulo = new Retangulo(LARG_RET, ALT_RET);
-                retangulo.setTranslateX(evento.getX());
-                retangulo.setTranslateY(evento.getY());
-                retangulo.removeListeners();
-                panePrincipal.getChildren().add(retangulo);
+                if (!mouseSobreShape()) {
+                    Retangulo retangulo = new Retangulo(LARG_RET, ALT_RET);
+                    retangulo.setTranslateX(evento.getX());
+                    retangulo.setTranslateY(evento.getY());
+                    retangulo.removeListeners();
+                    panePrincipal.getChildren().add(retangulo);
+                }
             });
         });
         tgoSelecionar.setOnAction(event -> {
@@ -109,14 +115,15 @@ public class TelaPrincipalController implements Initializable {
             retanguloSelecao.setStrokeWidth(1);
             retanguloSelecao.setFill(Color.SLATEBLUE);
             retanguloSelecao.setOpacity(0.5);
-            retanguloSelecao.toFront();            
-            panePrincipal.getChildren().add(retanguloSelecao);            
+            retanguloSelecao.toFront();
+            panePrincipal.getChildren().remove(retanguloSelecao);
+            panePrincipal.getChildren().add(retanguloSelecao);
             panePrincipal.setOnMouseClicked(null);
             panePrincipal.setOnMousePressed(evento -> {
                 initX = evento.getX();
                 initY = evento.getY();
                 ponto = new Point2D((float) evento.getX(), (float) evento.getY());
-                System.out.println("mouse pressed");
+                //System.out.println("mouse pressed - selecionados: "+nodesSelecteds.size());
             });
             panePrincipal.setOnMouseDragged(mouse -> {
                 if (!mouseSobreShape()) {
@@ -129,12 +136,31 @@ public class TelaPrincipalController implements Initializable {
                     retanguloSelecao.setTranslateY(initY);
                     retanguloSelecao.setWidth(mouse.getX() - initX);
                     retanguloSelecao.setHeight(mouse.getY() - initY);
-                }
-                else {
-                    System.out.println("mouse sobre shape");
-                }
+                    for (int i = 0; i < panePrincipal.getChildren().size(); i++) {
+                        Node node = panePrincipal.getChildren().get(i);
+                        if (!node.equals(retanguloSelecao)) {
+                            if (retanguloSelecao.getTranslateX() <= node.getTranslateX() - RAIO_CIRCULO
+                                    && retanguloSelecao.getTranslateY() <= node.getTranslateY() - RAIO_CIRCULO
+                                    && (node.getTranslateX() + RAIO_CIRCULO) <= retanguloSelecao.getTranslateX() + retanguloSelecao.getWidth()
+                                    && (node.getTranslateY() + RAIO_CIRCULO) <= retanguloSelecao.getTranslateY() + retanguloSelecao.getHeight()) {
+                                //System.out.println("dentro do retangulo");
+                                ((Shape) node).setStroke(Color.BLUE);
+                                if (!nodesSelecteds.contains(node)) {
+                                    nodesSelecteds.add(node);
+                                }
+                            } else {
+                                ((Shape) node).setStroke(Color.BLACK);
+                                nodesSelecteds.remove(node);
+                                //System.out.println("fora do retangulo");                                
+                            }
+                        }
+                    }
+                } /*else {
+                 System.out.println("mouse sobre shape");
+                 }*/
+
             });
-            panePrincipal.setOnMouseReleased(mouse ->{
+            panePrincipal.setOnMouseReleased(mouse -> {
                 retanguloSelecao.setTranslateX(-1);
                 retanguloSelecao.setTranslateY(-1);
                 retanguloSelecao.setWidth(0);
@@ -155,20 +181,40 @@ public class TelaPrincipalController implements Initializable {
         sliderOpacidade.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                node.setOpacity(newValue.doubleValue());
+                if (nodesSelecteds.size() == 0) {
+                    node.setOpacity(newValue.doubleValue());
+                    return;
+                }
+                for (Node node : nodesSelecteds) {
+                    node.setOpacity(newValue.doubleValue());
+                }
+
             }
         });
         sliderEscala.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                node.setScaleX(newValue.doubleValue());
-                node.setScaleY(newValue.doubleValue());
+                if (nodesSelecteds.size() == 0) {
+                    node.setScaleX(newValue.doubleValue());
+                    node.setScaleY(newValue.doubleValue());
+                    return;
+                }
+                for (Node node : nodesSelecteds) {
+                    node.setScaleX(newValue.doubleValue());
+                    node.setScaleY(newValue.doubleValue());
+                }
             }
         });
         colorPick.valueProperty().addListener(new ChangeListener<Color>() {
             @Override
             public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
-                ((Shape) node).setFill(new Color(newValue.getRed(), newValue.getGreen(), newValue.getBlue(), newValue.getOpacity()));
+                if (nodesSelecteds.size() == 0) {
+                    ((Shape) node).setFill(new Color(newValue.getRed(), newValue.getGreen(), newValue.getBlue(), newValue.getOpacity()));
+                    return;
+                }
+                for (Node node : nodesSelecteds) {
+                    ((Shape) node).setFill(new Color(newValue.getRed(), newValue.getGreen(), newValue.getBlue(), newValue.getOpacity()));
+                }
             }
         });
     }

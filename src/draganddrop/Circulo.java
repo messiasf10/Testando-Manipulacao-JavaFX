@@ -26,7 +26,7 @@ public class Circulo extends Circle {
     private double centroY;
     private double initX;
     private double initY;
-    private Point2D ponto;    
+    private Point2D ponto;
     private boolean mousePorCima = false;
 
     public Circulo(double raio) {
@@ -62,7 +62,7 @@ public class Circulo extends Circle {
             //this.toFront();
             this.mousePorCima = true;
         });
-        setOnMouseExited(mouse ->{
+        setOnMouseExited(mouse -> {
             this.mousePorCima = false;
         });
         setOnMouseClicked(event -> {
@@ -74,8 +74,8 @@ public class Circulo extends Circle {
                     ((Shape) n).setStroke(Color.BLACK);
                     ((Shape) n).setStrokeWidth(2);
                 }
-            }            
-            TelaPrincipalController.setNode(this);                 
+            }
+            TelaPrincipalController.setNode(this);
         });
     }
 

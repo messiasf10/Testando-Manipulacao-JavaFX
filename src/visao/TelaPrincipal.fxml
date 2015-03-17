@@ -33,7 +33,7 @@
          <items>
             <ToggleButton fx:id="tgoSelecionar" mnemonicParsing="false" text="Selecionar" />
             <ToggleButton fx:id="tgoCirculo" mnemonicParsing="false" text="Circulo" />
-            <ToggleButton fx:id="tgoRetangulo" mnemonicParsing="false" text="Retãngulo" />
+            <ToggleButton fx:id="tgoRetangulo" mnemonicParsing="false" text="Retângulo" />
          </items>
       </ToolBar>
       <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
