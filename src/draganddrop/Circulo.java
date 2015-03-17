@@ -33,9 +33,9 @@ public class Circulo extends Circle {
         setRadius(raio);
         setFill((Paint) Color.CHOCOLATE);
         setStroke(Color.BLACK);
-        setStrokeWidth(2);
+        setStrokeWidth(2);        
     }
-
+    
     public void addListeners(Pane principal) {
         setCursor(Cursor.HAND);
         setOnMouseDragged(mouse -> {
@@ -53,6 +53,16 @@ public class Circulo extends Circle {
             }
         });
         setOnMousePressed(mouse -> {
+            ObservableList<Node> lista = principal.getChildren();
+            this.setStroke(Color.BLUE);
+            this.setStrokeWidth(2);
+            for (Node n : lista) {
+                if (!((Shape) n).equals(this)) {
+                    ((Shape) n).setStroke(Color.BLACK);
+                    ((Shape) n).setStrokeWidth(2);
+                }
+            }
+            TelaPrincipalController.setNode(this);
             //QUANDO O MOUSE EH PRESSIONADO, GUARDA A POSICAO INICIAL
             initX = this.getTranslateX();
             initY = this.getTranslateY();
@@ -66,16 +76,7 @@ public class Circulo extends Circle {
             this.mousePorCima = false;
         });
         setOnMouseClicked(event -> {
-            ObservableList<Node> lista = principal.getChildren();
-            this.setStroke(Color.BLUE);
-            this.setStrokeWidth(2);
-            for (Node n : lista) {
-                if (!((Shape) n).equals(this)) {
-                    ((Shape) n).setStroke(Color.BLACK);
-                    ((Shape) n).setStrokeWidth(2);
-                }
-            }
-            TelaPrincipalController.setNode(this);
+            
         });
     }
 

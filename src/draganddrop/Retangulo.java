@@ -33,7 +33,7 @@ public class Retangulo extends Rectangle {
         setHeight(altura);
         setStroke(Color.BLACK);
         setStrokeWidth(2);
-        setFill(Color.GREEN);
+        setFill(Color.GREEN);        
     }
 
     public void addListeners(Pane principal) {
@@ -53,6 +53,16 @@ public class Retangulo extends Rectangle {
             }
         });
         setOnMousePressed(mouse -> {
+            ObservableList<Node> lista = principal.getChildren();
+            this.setStroke(Color.BLUE);
+            this.setStrokeWidth(2);
+            for (Node n : lista) {
+                if (!((Shape) n).equals(this)) {
+                    ((Shape) n).setStroke(Color.BLACK);
+                    ((Shape) n).setStrokeWidth(2);
+                }
+            }
+            TelaPrincipalController.setNode(this);
             //QUANDO O MOUSE EH PRESSIONADO, GUARDA A POSICAO INICIAL
             initX = this.getTranslateX();
             initY = this.getTranslateY();
@@ -66,16 +76,7 @@ public class Retangulo extends Rectangle {
             this.mousePorCima = false;
         });
         setOnMouseClicked(event -> {
-            ObservableList<Node> lista = principal.getChildren();
-            this.setStroke(Color.BLUE);
-            this.setStrokeWidth(2);
-            for (Node n : lista) {
-                if (!((Shape) n).equals(this)) {
-                    ((Shape) n).setStroke(Color.BLACK);
-                    ((Shape) n).setStrokeWidth(2);
-                }
-            }
-            TelaPrincipalController.setNode(this);
+            //TODO
         });
     }
 
@@ -95,5 +96,5 @@ public class Retangulo extends Rectangle {
     public void setMousePorCima(boolean mousePorCima) {
         this.mousePorCima = mousePorCima;
     }
-
+        
 }

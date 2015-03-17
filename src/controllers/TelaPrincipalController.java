@@ -1,11 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package controllers;
 
 import com.sun.javafx.geom.Point2D;
+import draganddrop.BigCirculo;
 import draganddrop.Circulo;
 import draganddrop.Retangulo;
 import java.net.URL;
@@ -19,12 +16,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -50,13 +50,15 @@ public class TelaPrincipalController implements Initializable {
     @FXML
     private TitledPane titledPaneProp;
     private ToggleGroup grupoA;
-    private static double RAIO_CIRCULO = 20, LARG_RET = 45, ALT_RET = 25;
+    private static double RAIO_CIRCULO = 20, LARG_RET = 45, ALT_RET = 25, RAIO_BIG_CIRCULO = 40;
     private static Node node;
     private double initX = 0;
     private double initY = 0;
     private Point2D ponto;
     private Rectangle retanguloSelecao = new Rectangle();
     private ObservableList<Node> nodesSelecteds = FXCollections.observableArrayList();
+    private ContextMenu contextMenu;
+    private MenuItem menuItemMesclar;
 
     /**
      * Initializes the controller class.
@@ -84,10 +86,26 @@ public class TelaPrincipalController implements Initializable {
         grupoA = new ToggleGroup();
         grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);
         acordionDireito.setExpandedPane(titledPaneProp);
+        contextMenu = new ContextMenu();
+        menuItemMesclar = new MenuItem("Mesclar Circulos");
+        menuItemMesclar.setOnAction(event -> {
+            BigCirculo bigCirculo = new BigCirculo(RAIO_BIG_CIRCULO, panePrincipal);
+            //bigCirculo.setCirculosSelecionados(nodesSelecteds);
+            for (Node n : nodesSelecteds) {
+                bigCirculo.add(n);
+                panePrincipal.getChildren().remove(n);                
+            }
+            nodesSelecteds.clear();
+            bigCirculo.setTranslateX(100);
+            bigCirculo.setTranslateY(100);
+            panePrincipal.getChildren().add(bigCirculo);
+        });
+        contextMenu.getItems().add(menuItemMesclar);
     }
 
     private void initListeners() {
         tgoCirculo.setOnAction(event -> {
+            panePrincipal.setOnMouseDragged(null);
             panePrincipal.setOnMouseClicked(evento -> {
                 if (!mouseSobreShape()) {
                     Circulo circulo = new Circulo(RAIO_CIRCULO);
@@ -100,6 +118,7 @@ public class TelaPrincipalController implements Initializable {
             });
         });
         tgoRetangulo.setOnAction(event -> {
+            panePrincipal.setOnMouseDragged(null);
             panePrincipal.setOnMouseClicked(evento -> {
                 if (!mouseSobreShape()) {
                     Retangulo retangulo = new Retangulo(LARG_RET, ALT_RET);
@@ -118,7 +137,13 @@ public class TelaPrincipalController implements Initializable {
             retanguloSelecao.toFront();
             panePrincipal.getChildren().remove(retanguloSelecao);
             panePrincipal.getChildren().add(retanguloSelecao);
-            panePrincipal.setOnMouseClicked(null);
+            panePrincipal.setOnMouseClicked(mouse -> {
+                if (MouseButton.SECONDARY.equals(mouse.getButton())) {
+                    contextMenu.show(panePrincipal, mouse.getScreenX(), mouse.getScreenY());
+                } else {
+                    contextMenu.hide();
+                }
+            });
             panePrincipal.setOnMousePressed(evento -> {
                 initX = evento.getX();
                 initY = evento.getY();
@@ -134,8 +159,14 @@ public class TelaPrincipalController implements Initializable {
                     double novaPosicaoY = initY + dragY;
                     retanguloSelecao.setTranslateX(initX);
                     retanguloSelecao.setTranslateY(initY);
-                    retanguloSelecao.setWidth(mouse.getX() - initX);
-                    retanguloSelecao.setHeight(mouse.getY() - initY);
+                    retanguloSelecao.setWidth(Math.abs(mouse.getX() - initX));
+                    retanguloSelecao.setHeight(Math.abs(mouse.getY() - initY));
+                    if ((mouse.getX() <= retanguloSelecao.getTranslateX())) {
+                        retanguloSelecao.setTranslateX(mouse.getX());
+                    }
+                    if ((mouse.getY() <= retanguloSelecao.getTranslateY())) {
+                        retanguloSelecao.setTranslateY(mouse.getY());
+                    }
                     for (int i = 0; i < panePrincipal.getChildren().size(); i++) {
                         Node node = panePrincipal.getChildren().get(i);
                         if (!node.equals(retanguloSelecao)) {
@@ -168,7 +199,10 @@ public class TelaPrincipalController implements Initializable {
             });
             ObservableList<Node> listaCirculos = panePrincipal.getChildren();
             for (Node node : listaCirculos) {
-                if (node instanceof Circulo) {
+                if (node instanceof BigCirculo) {
+                    ((BigCirculo) node).addListeners(panePrincipal);
+                    ((BigCirculo) node).doubleClick();
+                } else if (node instanceof Circulo) {
                     ((Circulo) node).addListeners(panePrincipal);
                 } else if (node instanceof Retangulo) {
                     ((Retangulo) node).addListeners(panePrincipal);
