@@ -1,4 +1,3 @@
-
 package controllers;
 
 import com.sun.javafx.geom.Point2D;
@@ -40,7 +39,7 @@ public class TelaPrincipalController implements Initializable {
     @FXML
     private Pane panePrincipal;
     @FXML
-    private ToggleButton tgoSelecionar, tgoCirculo, tgoRetangulo;
+    private ToggleButton tgoSelecionar, tgoCirculo, tgoRetangulo, tgoApagar;
     @FXML
     private Slider sliderOpacidade, sliderEscala;
     @FXML
@@ -84,7 +83,7 @@ public class TelaPrincipalController implements Initializable {
         tgoRetangulo.setGraphic(imgRetangulo);
         tgoSelecionar.setGraphic(imgSeta);
         grupoA = new ToggleGroup();
-        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo);
+        grupoA.getToggles().addAll(tgoCirculo, tgoSelecionar, tgoRetangulo, tgoApagar);
         acordionDireito.setExpandedPane(titledPaneProp);
         contextMenu = new ContextMenu();
         menuItemMesclar = new MenuItem("Mesclar Circulos");
@@ -93,7 +92,7 @@ public class TelaPrincipalController implements Initializable {
             //bigCirculo.setCirculosSelecionados(nodesSelecteds);
             for (Node n : nodesSelecteds) {
                 bigCirculo.add(n);
-                panePrincipal.getChildren().remove(n);                
+                panePrincipal.getChildren().remove(n);
             }
             nodesSelecteds.clear();
             bigCirculo.setTranslateX(100);
@@ -208,6 +207,29 @@ public class TelaPrincipalController implements Initializable {
                     ((Retangulo) node).addListeners(panePrincipal);
                 }
             }
+        });
+        tgoApagar.setOnAction(event -> {
+            ObservableList<Node> listaCirculos = panePrincipal.getChildren();
+            panePrincipal.setOnMouseClicked(mouseClicked -> {
+                for (Node node : listaCirculos) {
+                    if (node instanceof BigCirculo) {
+                        if (((BigCirculo) node).isMousePorCima()) {
+                            panePrincipal.getChildren().remove(node);
+                            break;
+                        }
+                    } else if (node instanceof Circulo) {
+                        if (((Circulo) node).isMousePorCima()) {
+                            panePrincipal.getChildren().remove(node);
+                            break;
+                        }
+                    } else if (node instanceof Retangulo) {
+                        if (((Retangulo) node).isMousePorCima()) {
+                            panePrincipal.getChildren().remove(node);
+                            break;
+                        }
+                    }
+                }
+            });
         });
     }
 

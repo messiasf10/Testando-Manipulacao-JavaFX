@@ -79,7 +79,7 @@ public class Circulo extends Circle {
             
         });
     }
-
+    
     public void removeListeners() {
         setCursor(null);
         setOnMouseDragged(null);
