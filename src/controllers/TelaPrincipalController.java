@@ -94,9 +94,7 @@ public class TelaPrincipalController implements Initializable {
                 bigCirculo.add(n);
                 panePrincipal.getChildren().remove(n);
             }
-            nodesSelecteds.clear();
-            bigCirculo.setTranslateX(100);
-            bigCirculo.setTranslateY(100);
+            nodesSelecteds.clear();            
             panePrincipal.getChildren().add(bigCirculo);
         });
         contextMenu.getItems().add(menuItemMesclar);
