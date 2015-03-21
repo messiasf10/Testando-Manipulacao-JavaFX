@@ -69,36 +69,37 @@ public class BigCirculo extends Circulo {
     }
 
     private void relocar() {
-        Node maisCentral = null;
-        double menorDistancia = 0;
-        double translateXVelho = 0;
-        double translateYVelho = 0;
+        double menorX = 0, menorY = 0, maiorX = 0, maiorY = 0;
+        menorX = circulosSelecionados.get(0).getTranslateX();
+        menorY = circulosSelecionados.get(0).getTranslateY();
+        maiorX = circulosSelecionados.get(0).getTranslateX();
+        maiorY = circulosSelecionados.get(0).getTranslateY();
+        for (Node n : circulosSelecionados) {
+            if (n.getTranslateX() <= menorX) {
+                menorX = n.getTranslateX();
+            }
+            if (n.getTranslateX() > maiorX) {
+                maiorX = n.getTranslateX();
+            }
+            if (n.getTranslateY() <= menorY) {
+                menorY = n.getTranslateY();
+            }
+            if (n.getTranslateY() > maiorY);
+            {
+                maiorY = n.getTranslateY();
+            }
+        }
+        double largura = maiorX - menorX;
+        double altura = maiorY - menorY;        
+        double translateXVelho = menorX + (largura / 2);
+        double translateYVelho = menorY + (altura / 2);
         double translateXNovo = this.getTranslateX();
         double translateYNovo = this.getTranslateY();
-        if (circulosSelecionados.size() != 0) {
-            menorDistancia = distancia(circulosSelecionados.get(0).getTranslateX(), circulosSelecionados.get(0).getTranslateY(), translateXNovo, translateYNovo);
-            for (Node n : circulosSelecionados) {
-                if (distancia(n.getTranslateX(), n.getTranslateY(), translateXNovo, translateYNovo) <= menorDistancia) {
-                    menorDistancia = distancia(n.getTranslateX(), n.getTranslateY(), translateXNovo, translateYNovo);
-                    maisCentral = n;
-                    translateXVelho = n.getTranslateX();
-                    translateYVelho = n.getTranslateY();
-                }
-            }
-            //translateXVelho = circulosSelecionados.get(0).getTranslateX();
-            //translateYVelho = circulosSelecionados.get(0).getTranslateY();
-            translateXNovo = this.getTranslateX();
-            translateYNovo = this.getTranslateY();
-            maisCentral.setTranslateX(translateXNovo);
-            maisCentral.setTranslateY(translateYNovo);
-        }
         for (int i = 0; i < circulosSelecionados.size(); i++) {
-            if (!circulosSelecionados.get(i).equals(maisCentral)) {
-                double difX = (translateXVelho - circulosSelecionados.get(i).getTranslateX()) * -1;
-                double difY = (translateYVelho - circulosSelecionados.get(i).getTranslateY()) * -1;
-                circulosSelecionados.get(i).setTranslateX(translateXNovo + difX);
-                circulosSelecionados.get(i).setTranslateY(translateYNovo + difY);
-            }
+            double difX = (translateXVelho - circulosSelecionados.get(i).getTranslateX()) * -1;
+            double difY = (translateYVelho - circulosSelecionados.get(i).getTranslateY()) * -1;
+            circulosSelecionados.get(i).setTranslateX(translateXNovo + difX);
+            circulosSelecionados.get(i).setTranslateY(translateYNovo + difY);
         }
     }
 
